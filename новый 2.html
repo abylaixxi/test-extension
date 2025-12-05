@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Focus Test Pro</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            padding: 50px; 
+            background: lightgreen; 
+            transition: background 0.5s; 
+        }
+        .lost { background: red !important; color: white; }
+        #counter { font-size: 24px; margin: 20px; }
+        #status { font-size: 18px; }
+    </style>
+</head>
+<body>
+    <h1>Тестер потери фокуса</h1>
+    <p id="status">Status: Focused (всё ок)</p>
+    <div id="counter">Счётчик потерь фокуса: 0</div>
+    <p>Инструкция: Нажми Ctrl+Shift+Y (Merlin) или другую горячую клавишу расширения. Если статус не изменится на "Focus Lost" и фон не покраснеет — расширение незаметно!</p>
+
+    <script>
+        let focusLostCount = 0;
+        const statusEl = document.getElementById('status');
+        const counterEl = document.getElementById('counter');
+        const body = document.body;
+
+        function updateStatus(message, isLost = false) {
+            statusEl.textContent = `Status: ${message}`;
+            counterEl.textContent = `Счётчик потерь фокуса: ${focusLostCount}`;
+            if (isLost) {
+                body.classList.add('lost');
+            } else {
+                body.classList.remove('lost');
+            }
+        }
+
+        // Обработчик blur (для клика вне окна/вкладки)
+        window.addEventListener('blur', function() {
+            focusLostCount++;
+            updateStatus('Focus Lost! (выход из фокуса)', true);
+            console.log('Blur event: Фокус потерян!');
+        });
+
+        // Обработчик focus (возврат фокуса)
+        window.addEventListener('focus', function() {
+            updateStatus('Focused (всё ок)', false);
+            console.log('Focus event: Фокус возвращён');
+        });
+
+        // Дополнительно: Page Visibility API (для переключения вкладок или минимизации)
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                focusLostCount++;
+                updateStatus('Page Hidden! (страница скрыта)', true);
+                console.log('Visibility change: Страница скрыта');
+            } else {
+                updateStatus('Page Visible & Focused', false);
+                console.log('Visibility change: Страница видна');
+            }
+        });
+
+        // Инициализация
+        updateStatus('Focused (всё ок)', false);
+        console.log('Тестер запущен. Проверь консоль браузера (F12) для логов.');
+    </script>
+</body>
+</html>
